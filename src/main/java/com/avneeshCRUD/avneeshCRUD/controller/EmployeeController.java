@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.avneeshCRUD.avneeshCRUD.custom.exception.BusinessException;
+import com.avneeshCRUD.avneeshCRUD.custom.exception.ControllerException;
 import com.avneeshCRUD.avneeshCRUD.entity.Employee;
 import com.avneeshCRUD.avneeshCRUD.service.EmployeeServiceInterface;
 
@@ -41,9 +43,16 @@ public class EmployeeController {
 	}
 	
 	@PostMapping("/add")
-	public ResponseEntity<Employee> addEmployee(@RequestBody Employee employee){
-		Employee employeeSaved = employeeServiceInterface.addEmployee(employee);
+	public ResponseEntity<?> addEmployee(@RequestBody Employee employee){
+		try { Employee employeeSaved = employeeServiceInterface.addEmployee(employee);
 		return new ResponseEntity<Employee>(employeeSaved, HttpStatus.CREATED);
+		}catch (BusinessException e) {
+			ControllerException ce = new ControllerException("611","service error"+e.getMessage());
+			return new ResponseEntity<ControllerException> (ce,HttpStatus.BAD_REQUEST);
+		}catch (Exception e) {
+			ControllerException ce = new ControllerException("612","Controller error"+e.getMessage()); 
+			return new ResponseEntity<ControllerException> (ce, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 		
 	}
 	
